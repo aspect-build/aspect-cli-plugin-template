@@ -1,0 +1,4 @@
+- name: your-plugin
+  from: ../../bazel-bin/plugins/your-plugin/your-plugin_/your-plugin
+  # The possible log levels are: TRACE, DEBUG, INFO, WARN, ERROR, OFF.
+  log_level: OFF
