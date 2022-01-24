@@ -21,7 +21,7 @@ func main() {
 }
 
 // YourPlugin implements an aspect CLI plugin.
-type YourPlugin struct {}
+type YourPlugin struct{}
 
 // NewDefaultPlugin creates a new YourPlugin with the default
 // dependencies.
@@ -53,5 +53,13 @@ func (plugin *YourPlugin) PostTestHook(
 	promptRunner ioutils.PromptRunner,
 ) error {
 	// Perform a post test action
+	return nil
+}
+
+func (plugin *YourPlugin) PostRunHook(
+	isInteractiveMode bool,
+	promptRunner ioutils.PromptRunner,
+) error {
+	// Perform a post run action
 	return nil
 }

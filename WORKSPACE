@@ -40,8 +40,8 @@ http_archive(
 git_repository(
     name = "aspect_cli",
     remote = "https://github.com/aspect-build/aspect-cli",
-    commit = "0d103b80aa69764d1d62a6ed859b8e4db243ccce",
-    shallow_since = "1641679671 -0800",
+    commit = "f182d373e1ea26e594348b397f487c13b77edfdd",
+    shallow_since = "1643037651 -0800"
 )
 
 load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
