@@ -1,1 +1,1 @@
-workspace(name = "fix_visibility")
+workspace(name = "your_plugin")
