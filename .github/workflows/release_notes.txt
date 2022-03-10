@@ -1,0 +1,6 @@
+To use this plugin, add it to your `.aspectplugins` file like so:
+
+```
+- name: hello-world
+  from: github.com/aspect-build/aspect-cli-plugin-template
+```

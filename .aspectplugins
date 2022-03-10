@@ -1,0 +1,5 @@
+- name: hello-world
+  from: bazel-bin/aspect-cli-plugin-template_/aspect-cli-plugin-template
+  # The possible log levels are: TRACE, DEBUG, INFO, WARN, ERROR, OFF.
+  # NB: to diagnose plugin crashes, use DEBUG
+  log_level: WARN

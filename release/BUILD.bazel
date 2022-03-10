@@ -1,0 +1,12 @@
+load(":release.bzl", "multi_platform_binaries", "release")
+
+multi_platform_binaries(
+    name = "plugin",
+    embed = ["//:aspect-cli-plugin-template_lib"],
+    prefix = "plugin-",
+)
+
+release(
+    name = "release",
+    targets = [":plugin"],
+)
