@@ -24,10 +24,14 @@ go_library(
     importpath = "github.com/aspect-build/aspect-cli-plugin-template",
     visibility = ["//:__subpackages__"],
     deps = [
+        "@build_aspect_cli//bazel/buildeventstream",
+        "@build_aspect_cli//bazel/command_line",
         "@build_aspect_cli//pkg/bazel",
+        "@build_aspect_cli//pkg/ioutils",
         "@build_aspect_cli//pkg/plugin/sdk/v1alpha3/config",
         "@build_aspect_cli//pkg/plugin/sdk/v1alpha3/plugin",
         "@com_github_hashicorp_go_plugin//:go-plugin",
+        "@com_github_manifoldco_promptui//:promptui",
     ],
 )
 

@@ -24,7 +24,7 @@ This is a plugin for the Aspect CLI.
 
 ## Developing
 
-To try the plugin, first check that you have a recent [aspect cli installed].
+To try the plugin, first check that you have the most recent [aspect cli release] installed.
 
 First build it. We assume you have installed [bazelisk] on your $PATH as `bazel`.
 
@@ -55,4 +55,4 @@ The actions integration will create a release.
 [bazelisk]: https://bazel.build/install/bazelisk
 [aspect cli]: https://aspect.build
 [plugin documentation]: https://aspect.build/help/topics/plugins
-[aspect cli installed]: https://github.com/aspect-build/aspect-cli/releases
+[aspect cli release]: https://github.com/aspect-build/aspect-cli/releases
