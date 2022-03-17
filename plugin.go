@@ -24,6 +24,7 @@ func main() {
 // HelloWorldPlugin declares the fields on an instance of the plugin.
 type HelloWorldPlugin struct {
 	// Base gives default implementations of the plugin methods, so implementing them below is optional.
+	// See the definition of aspectplugin.Base for more methods that can be implemented by the plugin.
 	aspectplugin.Base
 	// This plugin will store some state from the Build Events for use at the end of the build.
 	command_line.CommandLine
