@@ -16,23 +16,20 @@ import (
 	aspectplugin "aspect.build/cli/pkg/plugin/sdk/v1alpha3/plugin"
 )
 
+// main starts up the plugin as a child process of the CLI and connects the gRPC communication.
 func main() {
-	goplugin.Serve(config.NewConfigFor(NewDefaultPlugin()))
+	goplugin.Serve(config.NewConfigFor(&HelloWorldPlugin{}))
 }
 
+// HelloWorldPlugin declares the fields on an instance of the plugin.
 type HelloWorldPlugin struct {
+	// Base gives default implementations of the plugin methods, so implementing them below is optional.
 	aspectplugin.Base
+	// This plugin will store some state from the Build Events for use at the end of the build.
 	command_line.CommandLine
 }
 
-func NewDefaultPlugin() *HelloWorldPlugin {
-	return NewPlugin()
-}
-
-func NewPlugin() *HelloWorldPlugin {
-	return &HelloWorldPlugin{}
-}
-
+// CustomCommands contributes a new 'hello-world' command alongside the built-in ones like 'build' and 'test'.
 func (plugin *HelloWorldPlugin) CustomCommands() ([]*aspectplugin.Command, error) {
 	return []*aspectplugin.Command{
 		aspectplugin.NewCommand(
@@ -52,9 +49,7 @@ func (plugin *HelloWorldPlugin) CustomCommands() ([]*aspectplugin.Command, error
 		),
 	}, nil
 }
-// BEPEventCallback satisfies the Plugin interface. It process all the analysis
-// failures that represent a visibility issue, collecting them for later
-// processing in the post-build hook execution.
+// BEPEventCallback subscribes to all Build Events, and lets our logic react to ones we care about.
 func (plugin *HelloWorldPlugin) BEPEventCallback(event *buildeventstream.BuildEvent) error {
 	switch event.Payload.(type) {
 		case *buildeventstream.BuildEvent_StructuredCommandLine:
@@ -63,11 +58,15 @@ func (plugin *HelloWorldPlugin) BEPEventCallback(event *buildeventstream.BuildEv
 	return nil
 }
 
+// PostBuildHook will be called at the end of an `aspect build` execution, after Bazel completes.
 func (plugin *HelloWorldPlugin) PostBuildHook(
 	isInteractiveMode bool,
 	promptRunner ioutils.PromptRunner,
 ) error {
+	// We condition prompting on whether there's an interactive user to engage with.
 	if isInteractiveMode {
+		// The manifoldco/promptui library creates many styles of interactive prompts.
+		// Check out the examples: https://github.com/manifoldco/promptui/tree/master/_examples
 		prompt := promptui.Prompt{
 			Label:     "Would you like to see the command that was run",
 			IsConfirm: true,
@@ -80,13 +79,14 @@ func (plugin *HelloWorldPlugin) PostBuildHook(
 	return nil
 }
 
+// printTargetPattern is just representative of some logic a plugin might want to perform on the data collected.
 func (plugin *HelloWorldPlugin) printTargetPattern() {
 	for _, section := range plugin.CommandLine.Sections {
 		fmt.Fprintf(os.Stdout, "%s\n", section.SectionLabel)
 		if section.SectionLabel == "residual" {
 			switch f := section.SectionType.(type) {
 			case *command_line.CommandLineSection_ChunkList:
-				fmt.Fprintf(os.Stdout, "pattern was %s\n", f.ChunkList.Chunk[0])
+				fmt.Fprintf(os.Stdout, "target pattern was %s\n", f.ChunkList.Chunk[0])
 			}
 		}
 	}
