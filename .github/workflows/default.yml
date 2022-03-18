@@ -14,9 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Validate changed files
-        if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'allow sdk change')
-        run: ./.github/workflows/validate_changed_files.sh
       - name: Bazel caches
         uses: actions/cache@v2
         with:
