@@ -1,12 +1,13 @@
 load(":release.bzl", "multi_platform_binaries", "release")
 
 multi_platform_binaries(
-    name = "plugin",
+    # This name is chosen to match what we tell users to install in .aspectplugins:
+    # - name: hello-world
+    name = "hello-world",
     embed = ["//:aspect-cli-plugin-template_lib"],
-    prefix = "plugin-",
 )
 
 release(
     name = "release",
-    targets = [":plugin"],
+    targets = [":hello-world"],
 )
