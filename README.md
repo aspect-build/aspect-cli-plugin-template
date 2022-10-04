@@ -54,5 +54,5 @@ The actions integration will create a release.
 
 [bazelisk]: https://bazel.build/install/bazelisk
 [aspect cli]: https://aspect.build
-[plugin documentation]: https://aspect.build/help/topics/plugins
+[plugin documentation]: https://aspect-build.github.io/aspect-cli/help/topics/plugins
 [aspect cli release]: https://github.com/aspect-build/aspect-cli/releases
