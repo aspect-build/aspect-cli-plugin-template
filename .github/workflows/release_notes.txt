@@ -1,4 +1,4 @@
-To use this plugin, add it to your `.aspectplugins` file like so:
+To use this plugin, add it to your `.aspect/cli/plugins.yaml` file like so:
 
 ```
 - name: hello-world

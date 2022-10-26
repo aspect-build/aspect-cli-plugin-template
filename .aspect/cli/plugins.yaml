@@ -3,3 +3,4 @@
   # The possible log levels are: TRACE, DEBUG, INFO, WARN, ERROR, OFF.
   # NB: to diagnose plugin crashes, use DEBUG
   log_level: WARN
+  version: 0.0.0
