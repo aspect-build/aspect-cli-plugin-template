@@ -54,7 +54,10 @@ func (plugin *HelloWorldPlugin) CustomCommands() ([]*aspectplugin.Command, error
 func (plugin *HelloWorldPlugin) BEPEventCallback(event *buildeventstream.BuildEvent) error {
 	switch event.Payload.(type) {
 		case *buildeventstream.BuildEvent_StructuredCommandLine:
-			plugin.CommandLine = *event.GetStructuredCommandLine()
+			commandLine := *event.GetStructuredCommandLine()
+			if commandLine.CommandLineLabel == "canonical" {
+				plugin.CommandLine = commandLine
+			}
 	}
 	return nil
 }
