@@ -43,7 +43,7 @@ func (plugin *HelloWorldPlugin) CustomCommands() ([]*aspectplugin.Command, error
 				fmt.Println(args)
 				fmt.Println("Going to run: 'bazel help'")
 
-				bzl.Spawn([]string{"help"})
+				bzl.RunCommand(ioutils.DefaultStreams, "help")
 
 				return nil
 			},

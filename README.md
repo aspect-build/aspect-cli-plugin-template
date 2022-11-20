@@ -11,14 +11,13 @@ More details about aspect cli plugins is on the [plugin documentation].
 Create a new repo with the green "Use this template" button above.
 Then in your repo...
 
-1. Replace `aspect_plugin_hello_world` with ...
-1. Replace `hello_world` with ...
+1. Replace `hello_world` with your plugin name.
 1. Replace `github.com/aspect-build/aspect-cli-plugin-template` with the name of your Go module. See <https://go.dev/doc/modules/developing>
 1. Delete everything above the SNIP line below, and start coding on your features!
 
 ---------- %<  SNIP %< ------------
 
-# aspect_plugin_hello_world
+# My Plugin
 
 This is a plugin for the Aspect CLI.
 
@@ -26,26 +25,25 @@ This is a plugin for the Aspect CLI.
 
 To try the plugin, first check that you have the most recent [aspect cli release] installed.
 
-First build it. We assume you have installed [bazelisk] on your $PATH as `bazel`.
+First build the plugin from source:
 
 ```bash
 % bazel build ...
 ```
 
-> Note that the `.aspectplugins` file has a reference to the path under `bazel-bin` where the plugin binary was just written.
+Note that the `.aspect/cli/plugins.yaml` file has a reference to the path under `bazel-bin` where the plugin binary was just written.
+On the first build, you'll see a warning printed that the plugin doesn't exist at this path.
+This is just the development flow for working on plugins; users will reference the plugin's releases which are downloaded for them automatically.
 
-Now just run `aspect`. You should see:
+Now just run `aspect`. You should see that `hello-world` appears in the help output. This shows that our plugin was loaded and contributed a custom command to the CLI.
 
 ```
 Usage:
   aspect [command]
 
-Available Commands:
-  ...
-  hello-world   Print 'Hello World!' to the command line.
+Custom Commands from Plugins:
+  hello-world        Print 'Hello World!' to the command line.
 ```
-
-This shows that our plugin was loaded and contributed a custom command to the CLI.
 
 ## Releasing
 
@@ -53,6 +51,6 @@ Just push a tag to your GitHub repo.
 The actions integration will create a release.
 
 [bazelisk]: https://bazel.build/install/bazelisk
-[aspect cli]: https://aspect.build
-[plugin documentation]: https://aspect-build.github.io/aspect-cli/help/topics/plugins
+[aspect cli]: https://aspect.build/cli
+[plugin documentation]: https://docs.aspect.build/aspect-build/aspect-cli/5.0.1/docs/help/topics/plugins.html
 [aspect cli release]: https://github.com/aspect-build/aspect-cli/releases
