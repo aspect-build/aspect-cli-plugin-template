@@ -1,5 +1,7 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_gazelle//:def.bzl", "gazelle")
+load("//release:release.bzl", "sha256")
 
 # Run this target to update the go_* rules in this file
 # bazel run //:gazelle
@@ -41,4 +43,15 @@ go_binary(
     name = "aspect-cli-plugin-template",
     embed = [":aspect-cli-plugin-template_lib"],
     visibility = ["//visibility:public"],
+)
+
+sha256(
+    name = "checksum",
+    artifact = "plugin",
+)
+
+copy_file(
+    name = "plugin",
+    src = "aspect-cli-plugin-template",
+    out = "plugin",
 )
