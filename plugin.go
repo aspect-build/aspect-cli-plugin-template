@@ -69,7 +69,7 @@ func (plugin *HelloWorldPlugin) PostBuildHook(
 		// The manifoldco/promptui library creates many styles of interactive prompts.
 		// Check out the examples: https://github.com/manifoldco/promptui/tree/master/_examples
 		prompt := promptui.Prompt{
-			Label:     "Would you like to see the command that was run",
+			Label:     "Thanks for trying the hello-world plugin! Would you like to see the command that was run",
 			IsConfirm: true,
 		}
 		// Since the prompt is a boolean, any non-nil error should represent a NO.
