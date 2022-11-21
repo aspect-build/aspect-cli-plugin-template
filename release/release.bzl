@@ -3,6 +3,7 @@
 
 load("@io_bazel_rules_go//go:def.bzl", "go_binary")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@bazel_tools//tools/build_defs/hash:hash.bzl", "tools", _sha256 = "sha256")
 
 def _sha256_impl(ctx):
@@ -23,6 +24,31 @@ sha256 = rule(
     doc = "Calculate the SHA256 hash value for a file.",
     provides = [DefaultInfo],
 )
+
+def local_plugin(name, binary, path):
+    out = "_{}.out".format(name)
+    sum = "_{}.sum".format(name)
+
+    # Copy the default output of the binary rule.
+    # The path might be hard to predict, e.g. go_binary has an extra segment
+    copy_file(
+        name = out,
+        src = binary,
+        out = path,
+    )
+
+    # The plugin API requires a checksum for SecureConfig:
+    # https://github.com/hashicorp/go-plugin/pull/25
+    sha256(
+        name = sum,
+        artifact = out,
+    )
+
+    # Target you can build to do local dev
+    native.filegroup(
+        name = name,
+        srcs = [out, sum],
+    )
 
 PLATFORMS = [
     struct(os = "darwin", arch = "amd64", ext = "", gc_linkopts = ["-s", "-w"]),

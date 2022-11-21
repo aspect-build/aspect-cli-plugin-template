@@ -11,8 +11,8 @@ More details about aspect cli plugins is on the [plugin documentation].
 Create a new repo with the green "Use this template" button above.
 Then in your repo...
 
-1. Replace `hello_world` with your plugin name.
-1. Replace `github.com/aspect-build/aspect-cli-plugin-template` with the name of your Go module. See <https://go.dev/doc/modules/developing>
+1. Find-and-replace `hello_world` with your plugin name.
+1. Find-and-replace `github.com/aspect-build/aspect-cli-plugin-template` with the name of your Go module. See <https://go.dev/doc/modules/developing>
 1. Delete everything above the SNIP line below, and start coding on your features!
 
 ---------- %<  SNIP %< ------------
