@@ -13,7 +13,8 @@ Then in your repo...
 
 1. Find-and-replace `hello-world` with your plugin name.
 1. Find-and-replace `github.com/aspect-build/aspect-cli-plugin-template` with the name of your Go module. See <https://go.dev/doc/modules/developing>
-1. Delete everything above the SNIP line below, and start coding on your features!
+1. Start coding on your features!
+1. Delete everything above the SNIP line below, and replace it with info about your plugin. Consider showing off your new Bazel behavior with a little animated demo of your terminal! We highly recommend [asciinema](https://asciinema.org).
 
 ---------- %<  SNIP %< ------------
 
