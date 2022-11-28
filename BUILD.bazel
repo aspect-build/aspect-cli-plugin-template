@@ -19,6 +19,8 @@ gazelle(
 )
 
 # gazelle:prefix github.com/aspect-build/aspect-cli-plugin-template
+# Buildozer ships with BUILD files but doesn't follow our naming convention
+# gazelle:resolve go github.com/bazelbuild/buildtools/edit @com_github_bazelbuild_buildtools//edit:go_default_library
 go_library(
     name = "aspect-cli-plugin-template_lib",
     srcs = ["plugin.go"],
