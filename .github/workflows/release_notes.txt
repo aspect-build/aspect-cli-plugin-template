@@ -1,7 +1,8 @@
-To use this plugin, add it to your `.aspect/cli/plugins.yaml` file like so:
+To use this plugin, add it to your `.aspect/cli/config.yaml` file like so:
 
 ```
-- name: hello-world
-  from: github.com/aspect-build/aspect-cli-plugin-template
-  version: ${GITHUB_REF_NAME}
+plugins:
+  - name: hello-world
+    from: github.com/aspect-build/aspect-cli-plugin-template
+    version: ${GITHUB_REF_NAME}
 ```
