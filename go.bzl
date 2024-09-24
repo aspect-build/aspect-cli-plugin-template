@@ -24,6 +24,7 @@ def deps():
     )
     go_repository(
         name = "com_github_bazelbuild_bazel_gazelle",
+        build_file_generation = "clean",
         importpath = "github.com/bazelbuild/bazel-gazelle",
         sum = "h1:sPdMMujcMt5jeSLGFko5yF1XBD5MDqm6YeFoXx9ORm4=",
         version = "v0.28.0",
@@ -31,13 +32,14 @@ def deps():
 
     go_repository(
         name = "com_github_bazelbuild_bazelisk",
-        build_file_generation = "on",
+        build_file_generation = "clean",
         importpath = "github.com/bazelbuild/bazelisk",
         sum = "h1:SpigbUorngcfDULmft0WkdrYVCqqqsFPEW4hm8UA+Gk=",
         version = "v1.13.2",
     )
     go_repository(
         name = "com_github_bazelbuild_buildtools",
+        build_file_generation = "clean",
         importpath = "github.com/bazelbuild/buildtools",
         sum = "h1:jhiMzJ+8unnLRtV8rpbWBFE9pFNzIqgUTyZU5aA++w8=",
         version = "v0.0.0-20221004120235-7186f635531b",

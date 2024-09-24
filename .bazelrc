@@ -1,2 +1,4 @@
 build:release -c opt
 build --incompatible_strict_action_env
+
+common --enable_bzlmod=false
