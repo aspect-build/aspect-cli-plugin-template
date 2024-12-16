@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
+	"sync"
+	"time"
 
 	goplugin "github.com/hashicorp/go-plugin"
 	"github.com/manifoldco/promptui"
@@ -17,7 +20,9 @@ import (
 
 // main starts up the plugin as a child process of the CLI and connects the gRPC communication.
 func main() {
-	goplugin.Serve(config.NewConfigFor(&HelloWorldPlugin{}))
+	goplugin.Serve(config.NewConfigFor(&HelloWorldPlugin{
+		besChan: make(chan orderedBuildEvent, 100),
+	}))
 }
 
 // HelloWorldPlugin declares the fields on an instance of the plugin.
@@ -27,6 +32,15 @@ type HelloWorldPlugin struct {
 	aspectplugin.Base
 	// This plugin will store some state from the Build Events for use at the end of the build.
 	command_line.CommandLine
+
+	besOnce             sync.Once
+	besChan             chan orderedBuildEvent
+	besHandlerWaitGroup sync.WaitGroup
+}
+
+type orderedBuildEvent struct {
+	event          *buildeventstream.BuildEvent
+	sequenceNumber int64
 }
 
 // CustomCommands contributes a new 'hello-world' command alongside the built-in ones like 'build' and 'test'.
@@ -48,6 +62,52 @@ func (plugin *HelloWorldPlugin) CustomCommands() ([]*aspectplugin.Command, error
 
 // BEPEventCallback subscribes to all Build Events, and lets our logic react to ones we care about.
 func (plugin *HelloWorldPlugin) BEPEventCallback(event *buildeventstream.BuildEvent, sequenceNumber int64) error {
+	plugin.besChan <- orderedBuildEvent{event: event, sequenceNumber: sequenceNumber}
+
+	plugin.besOnce.Do(func() {
+		plugin.besHandlerWaitGroup.Add(1)
+		go func() {
+			defer plugin.besHandlerWaitGroup.Done()
+			var nextSn int64 = 1
+			eventBuf := make(map[int64]*buildeventstream.BuildEvent)
+			for o := range plugin.besChan {
+				if o.sequenceNumber == 0 {
+					// Zero is an invalid squence number. Process the event since we can't order it.
+					if err := plugin.BEPEventHandler(o.event); err != nil {
+						log.Printf("error handling build event: %v\n", err)
+					}
+					continue
+				}
+
+				// Check for duplicate sequence numbers
+				if _, exists := eventBuf[o.sequenceNumber]; exists {
+					log.Printf("duplicate sequence number %v\n", o.sequenceNumber)
+					continue
+				}
+
+				// Add the event to the buffer
+				eventBuf[o.sequenceNumber] = o.event
+
+				// Process events in order
+				for {
+					if orderedEvent, exists := eventBuf[nextSn]; exists {
+						if err := plugin.BEPEventHandler(orderedEvent); err != nil {
+							log.Printf("error handling build event: %v\n", err)
+						}
+						delete(eventBuf, nextSn) // Remove processed event
+						nextSn++                 // Move to the next expected sequence
+					} else {
+						break
+					}
+				}
+			}
+		}()
+	})
+
+	return nil
+}
+
+func (plugin *HelloWorldPlugin) BEPEventHandler(event *buildeventstream.BuildEvent) error {
 	switch event.Payload.(type) {
 	case *buildeventstream.BuildEvent_StructuredCommandLine:
 		commandLine := *event.GetStructuredCommandLine()
@@ -63,6 +123,14 @@ func (plugin *HelloWorldPlugin) PostBuildHook(
 	isInteractiveMode bool,
 	promptRunner ioutils.PromptRunner,
 ) error {
+	// Close the build events channel
+	close(plugin.besChan)
+
+	// Wait for all build events to come in
+	if !waitGroupWithTimeout(&plugin.besHandlerWaitGroup, 60*time.Second) {
+		log.Printf("timed out waiting for BES events\n")
+	}
+
 	// We condition prompting on whether there's an interactive user to engage with.
 	if isInteractiveMode {
 		// The manifoldco/promptui library creates many styles of interactive prompts.
@@ -79,6 +147,22 @@ func (plugin *HelloWorldPlugin) PostBuildHook(
 	return nil
 }
 
+// PostTestHook satisfies the Plugin interface. In this case, it just calls the PostBuildHook.
+func (plugin *HelloWorldPlugin) PostTestHook(
+	isInteractiveMode bool,
+	promptRunner ioutils.PromptRunner,
+) error {
+	return plugin.PostBuildHook(isInteractiveMode, promptRunner)
+}
+
+// PostRunHook satisfies the Plugin interface. In this case, it just calls the PostBuildHook.
+func (plugin *HelloWorldPlugin) PostRunHook(
+	isInteractiveMode bool,
+	promptRunner ioutils.PromptRunner,
+) error {
+	return plugin.PostBuildHook(isInteractiveMode, promptRunner)
+}
+
 // printTargetPattern is just representative of some logic a plugin might want to perform on the data collected.
 func (plugin *HelloWorldPlugin) printTargetPattern() {
 	for _, section := range plugin.CommandLine.Sections {
@@ -89,5 +173,25 @@ func (plugin *HelloWorldPlugin) printTargetPattern() {
 				fmt.Fprintf(os.Stdout, "target pattern was %s\n", f.ChunkList.Chunk[0])
 			}
 		}
+	}
+}
+
+// waitGroupWithTimeout waits for a WaitGroup with a specified timeout.
+func waitGroupWithTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {
+	done := make(chan struct{})
+
+	// Run a goroutine to close the channel when WaitGroup is done
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
+	select {
+	case <-done:
+		// WaitGroup finished within timeout
+		return true
+	case <-time.After(timeout):
+		// Timeout occurred
+		return false
 	}
 }
