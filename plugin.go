@@ -8,12 +8,11 @@ import (
 	goplugin "github.com/hashicorp/go-plugin"
 	"github.com/manifoldco/promptui"
 
-	"aspect.build/cli/bazel/buildeventstream"
-	"aspect.build/cli/bazel/command_line"
-	"aspect.build/cli/pkg/bazel"
-	"aspect.build/cli/pkg/ioutils"
-	"aspect.build/cli/pkg/plugin/sdk/v1alpha3/config"
-	aspectplugin "aspect.build/cli/pkg/plugin/sdk/v1alpha3/plugin"
+	"github.com/aspect-build/aspect-cli/bazel/buildeventstream"
+	"github.com/aspect-build/aspect-cli/bazel/command_line"
+	"github.com/aspect-build/aspect-cli/pkg/ioutils"
+	"github.com/aspect-build/aspect-cli/pkg/plugin/sdk/v1alpha4/config"
+	aspectplugin "github.com/aspect-build/aspect-cli/pkg/plugin/sdk/v1alpha4/plugin"
 )
 
 // main starts up the plugin as a child process of the CLI and connects the gRPC communication.
@@ -36,28 +35,25 @@ func (plugin *HelloWorldPlugin) CustomCommands() ([]*aspectplugin.Command, error
 		aspectplugin.NewCommand(
 			"hello-world",
 			"Print 'Hello World!' to the command line.",
-			"Print 'Hello World!' to the command line. Echo any given argument. Then run a 'bazel help'",
-			func(ctx context.Context, args []string, bzl bazel.Bazel) error {
+			"Print 'Hello World!' to the command line. Echo any given argument.",
+			func(ctx context.Context, args []string, bazelStartupArgs []string) error {
 				fmt.Println("Hello World!")
 				fmt.Print("Arguments passed to command: ")
 				fmt.Println(args)
-				fmt.Println("Going to run: 'bazel help'")
-
-				bzl.RunCommand(ioutils.DefaultStreams, "help")
-
 				return nil
 			},
 		),
 	}, nil
 }
+
 // BEPEventCallback subscribes to all Build Events, and lets our logic react to ones we care about.
-func (plugin *HelloWorldPlugin) BEPEventCallback(event *buildeventstream.BuildEvent) error {
+func (plugin *HelloWorldPlugin) BEPEventCallback(event *buildeventstream.BuildEvent, sequenceNumber int64) error {
 	switch event.Payload.(type) {
-		case *buildeventstream.BuildEvent_StructuredCommandLine:
-			commandLine := *event.GetStructuredCommandLine()
-			if commandLine.CommandLineLabel == "canonical" {
-				plugin.CommandLine = commandLine
-			}
+	case *buildeventstream.BuildEvent_StructuredCommandLine:
+		commandLine := *event.GetStructuredCommandLine()
+		if commandLine.CommandLineLabel == "canonical" {
+			plugin.CommandLine = commandLine
+		}
 	}
 	return nil
 }

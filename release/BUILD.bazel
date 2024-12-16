@@ -1,4 +1,5 @@
 "Targets used by the automation in .github/workflows/release.yml"
+
 load(":release.bzl", "multi_platform_binaries", "release")
 
 # Build a plugin for all supported platforms
